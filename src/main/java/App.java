@@ -7,27 +7,28 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class App {
     private final String GET_URL = "https://raw.githubusercontent.com/netology-code/jd-homeworks/master/http/task1/cats";
 
-    public void get(CloseableHttpClient httpClient) throws IOException {
+    public void get(CloseableHttpClient httpClient) {
         HttpGet request = new HttpGet(GET_URL);
-        CloseableHttpResponse response = httpClient.execute(request);
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<Cat> catList = objectMapper.readValue(response.getEntity().getContent(), new TypeReference<List<Cat>>() {
-        });
-        catList.stream()
-                .filter(cat -> cat.getUpvotes() != null && cat.getUpvotes() > 0)
-                .forEach(System.out::println);
+        CloseableHttpResponse response = null;
+        try {
+            response = httpClient.execute(request);
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<Cat> catList = objectMapper.readValue(response.getEntity().getContent(), new TypeReference<List<Cat>>() {
+            });
+            catList.stream()
+                    .filter(cat -> cat.getUpvotes() != null && cat.getUpvotes() > 0)
+                    .forEach(System.out::println);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         CloseableHttpClient closeableHttpClient = HttpClientBuilder.create()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setConnectTimeout(5000)
